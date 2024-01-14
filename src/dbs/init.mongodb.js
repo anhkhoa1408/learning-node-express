@@ -1,7 +1,11 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const connectionString = "mongodb://127.0.0.1:27017/shopDEV";
+const {
+  db: { host, port, name },
+} = require("./../configs/config.mongodb");
+
+const connectionString = `mongodb://${host}:${port}/${name}`;
 const { countCounnect } = require("./../helpers/check.connect");
 
 // Apply Singleton pattern

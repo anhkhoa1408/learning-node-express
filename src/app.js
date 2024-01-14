@@ -22,6 +22,7 @@
 // khi những dữ liệu payload được trả về cho client với số lượng lớn => nén lại
 // tiết kiệm băng thông cho client
 
+require("dotenv").config();
 const compression = require("compression");
 const express = require("express");
 const { default: helmet } = require("helmet");
