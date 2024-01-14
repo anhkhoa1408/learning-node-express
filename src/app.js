@@ -40,14 +40,7 @@ require("./dbs/init.mongodb");
 // checkOverload();
 
 // init routes
-app.get("/", (req, res, next) => {
-  const strCompress = "Hello";
-  return res.status(200).json({
-    message: "welcome",
-    metadata: strCompress.repeat(1000),
-  });
-});
-
+app.use("/", require("./routes"));
 // handle error
 
 module.exports = app;
