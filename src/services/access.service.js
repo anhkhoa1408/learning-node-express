@@ -56,16 +56,13 @@ class AccessService {
 
         // SOLUTION 2: for normal project
         const publicKey = crypto.randomBytes(64).toString("hex");
-        console.log("signup= - publicKey:", publicKey);
         const privateKey = crypto.randomBytes(64).toString("hex");
-        console.log("signup= - privateKey:", privateKey);
 
         const keyStore = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
           privateKey,
         });
-        console.log("signup= - keyStore:", keyStore);
 
         if (!keyStore) {
           return {
@@ -78,7 +75,7 @@ class AccessService {
 
         const tokens = await createTokenPair(
           {
-            userId: newShop._id,
+            user: newShop._id,
             email,
           },
           publicKey,
