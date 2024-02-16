@@ -6,8 +6,9 @@ const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/auth.utils");
 const { getInfoData } = require("./../utils");
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, AuthFailureError } = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
+const { generateKeyPair } = require("../utils/keypair");
 
 const RoleShop = {
   SHOP: "SHOP",
@@ -25,15 +26,46 @@ class AccessService {
     5/ get data return login
   */
   static login = async ({ email, password, refreshToken = null }) => {
+    // 1/
     const foundShop = await findByEmail({ email });
     if (!foundShop) {
       throw new BadRequestError("Shop not registered!");
     }
 
+    // 2.
     const match = bcrypt.compare(password, foundShop.password);
     if (!match) {
-      throw new BadRequestError("");
+      throw new AuthFailureError("Authentication error");
     }
+
+    // 3.
+    const { publicKey, privateKey } = generateKeyPair();
+
+    // 4.
+    const { _id: userId } = foundShop;
+    const tokens = await createTokenPair(
+      {
+        userId,
+        email,
+      },
+      publicKey,
+      privateKey,
+    );
+
+    await KeyTokenService.createKeyToken({
+      userId,
+      publicKey,
+      privateKey,
+      refreshToken: tokens.refreshToken,
+    });
+
+    return {
+      code: 200,
+      metadata: {
+        shop: getInfoData({ fields: ["_id", "name", "email"], object: foundShop }),
+        tokens,
+      },
+    };
   };
 
   static signup = async ({ name, email, password, roles }) => {
@@ -72,8 +104,7 @@ class AccessService {
       // });
 
       // SOLUTION 2: for normal project
-      const publicKey = crypto.randomBytes(64).toString("hex");
-      const privateKey = crypto.randomBytes(64).toString("hex");
+      const { publicKey, privateKey } = generateKeyPair();
 
       const keyStore = await KeyTokenService.createKeyToken({
         userId: newShop._id,

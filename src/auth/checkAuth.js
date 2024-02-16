@@ -1,5 +1,6 @@
 "use strict";
 
+// const apikeyModel = require("../models/apikey.model");
 const { findById } = require("../services/apiKey.service");
 
 const HEADER = {
@@ -9,6 +10,10 @@ const HEADER = {
 
 const apiKey = async (req, res, next) => {
   try {
+    // await apikeyModel.create({
+    //   key: "shopdev",
+    //   permissions: ["0000"],
+    // });
     const key = req.headers[HEADER.API_KEY]?.toString();
     if (!key) {
       return res.status(403).json({
@@ -16,7 +21,6 @@ const apiKey = async (req, res, next) => {
         message: "Forbidden error",
       });
     }
-
     const objKey = await findById(key);
     if (!objKey) {
       return res.status(403).json({
@@ -24,7 +28,6 @@ const apiKey = async (req, res, next) => {
         message: "Forbidden error",
       });
     }
-
     req.objKey = objKey;
     return next();
   } catch (error) {}
