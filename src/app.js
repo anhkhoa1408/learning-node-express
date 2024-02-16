@@ -40,12 +40,30 @@ app.use(
     extended: true,
   }),
 );
+
 // init db
 require("./dbs/init.mongodb");
 // checkOverload();
 
 // init routes
 app.use("/", require("./routes"));
-// handle error
 
+// handle error
+// this middleware will set status to 404 for any invalid route, and passing to below (next) middleware
+app.use((req, res, next) => {
+  const error = new Error("Not found");
+  error.status = 404;
+  next(error);
+});
+
+// this middleware will handle errors so its has the first parameter named err
+app.use((err, req, res, next) => {
+  console.log("app.use - err:", err);
+  const statusCode = err.status || 500;
+  return res.status(statusCode).json({
+    status: "error",
+    code: statusCode,
+    message: err.message || "Internal Server Error",
+  });
+});
 module.exports = app;

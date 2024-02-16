@@ -1,7 +1,7 @@
 @url_dev=http://localhost:9081/v1/api
 
 # signup
-POST {{url_dev}}/shop/signup
+POST {{url_dev}}/shop/signupaaa
 Content-Type: application/json
 X-Api-Key: 05b002dbf7d09ba20ef6d28e8c8911549f7c77490d1d42d94edff74d4fb5c275cb009aba334b3af87078a9eef04f579d6be535987f6fd8a71acc0d4f6af3b6d1
 
