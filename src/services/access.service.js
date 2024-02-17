@@ -4,7 +4,7 @@ const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
 const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/auth.utils");
+const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("./../utils");
 const { BadRequestError, AuthFailureError } = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
@@ -18,6 +18,8 @@ const RoleShop = {
 };
 
 class AccessService {
+  static logout = async ({ email, password, refreshToken = null }) => {};
+
   /* 
     1/ check email in dbs
     2/ match password

@@ -5,6 +5,7 @@ const { findById } = require("../services/apiKey.service");
 
 const HEADER = {
   API_KEY: "x-api-key",
+  CLIENT_ID: "x-client-id",
   AUTHORIZATION: "Authorization",
 };
 
@@ -55,4 +56,5 @@ const permission = (permission) => {
 module.exports = {
   apiKey,
   permission,
+  HEADER,
 };
