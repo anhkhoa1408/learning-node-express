@@ -18,7 +18,11 @@ const RoleShop = {
 };
 
 class AccessService {
-  static logout = async ({ email, password, refreshToken = null }) => {};
+  static logout = async ({ keyStore }) => {
+    const delKey = await KeyTokenService.removeKeyById(keyStore._id);
+    console.log(delKey);
+    return delKey;
+  };
 
   /* 
     1/ check email in dbs
@@ -122,7 +126,7 @@ class AccessService {
 
       const tokens = await createTokenPair(
         {
-          user: newShop._id,
+          userId: newShop._id,
           email,
         },
         publicKey,

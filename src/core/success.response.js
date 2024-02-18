@@ -22,7 +22,7 @@ class OK extends SuccessResponse {
 }
 
 class CREATED extends SuccessResponse {
-  constructor({ message, statusCode = ReasonPhrases.CREATED, reasonStatusCode = statusCodes.CREATED, metadata }) {
+  constructor({ message, statusCode = statusCodes.CREATED, reasonStatusCode = ReasonPhrases.CREATED, metadata }) {
     super({ message, statusCode, reasonStatusCode, metadata });
   }
 }
