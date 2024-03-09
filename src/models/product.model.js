@@ -17,6 +17,12 @@ const productSchema = new Schema(
       required: true,
     },
     product_description: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      // Ref to Shop collection
+      ref: "Shop",
+    },
     product_price: {
       type: Number,
       required: true,
