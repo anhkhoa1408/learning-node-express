@@ -20,7 +20,6 @@ const productSchema = new Schema(
     product_shop: {
       type: Schema.Types.ObjectId,
       required: true,
-      // Ref to Shop collection
       ref: "Shop",
     },
     product_price: {
@@ -55,6 +54,11 @@ const clothingSchema = new Schema(
     },
     size: String,
     material: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Shop",
+    },
   },
   {
     collection: "Clothes",
@@ -70,6 +74,11 @@ const electronicSchema = new Schema(
     },
     model: String,
     color: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Shop",
+    },
   },
   {
     collection: "Electronics",
