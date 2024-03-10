@@ -66,6 +66,49 @@ class AccessService {
     };
   };
 
+  static handleRefreshTokenV2 = async ({ refreshToken, user, keyStore }) => {
+    const { userId, email } = user;
+
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbiddenError("Something wrong happened, please re-login!");
+    }
+
+    if (keyStore.refreshToken !== refreshToken) {
+      throw new AuthFailureError("Shop not registered");
+    }
+
+    // check userId
+    const foundShop = await findByEmail({
+      email,
+    });
+    if (!foundShop) throw new AuthFailureError("Shop not registered");
+
+    // generate new token pair
+    const tokens = await createTokenPair(
+      {
+        userId,
+        email,
+      },
+      keyStore.publicKey,
+      keyStore.privateKey,
+    );
+
+    await keyStore.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken,
+      },
+    });
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
+
   static logout = async ({ keyStore }) => {
     const delKey = await KeyTokenService.removeKeyById(keyStore._id);
     console.log(delKey);
