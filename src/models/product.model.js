@@ -1,9 +1,12 @@
 "use strict";
 
-const { Schema, model } = require("mongoose");
+const { Schema, model, set } = require("mongoose");
 
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
+
+// make a string look like a slug in url
+const slugify = require("slugify");
 
 // Declare the Schema of the Mongo model
 const productSchema = new Schema(
@@ -17,6 +20,7 @@ const productSchema = new Schema(
       required: true,
     },
     product_description: String,
+    product_slug: String,
     product_shop: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -39,12 +43,47 @@ const productSchema = new Schema(
       type: Schema.Types.Mixed,
       required: true,
     },
+
+    product_averageRating: {
+      type: Number,
+      default: 4.5,
+      min: [1, "Rating must be larger than 1"],
+      max: [5, "Rating must be smaller than 5"],
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    product_variations: {
+      type: Array,
+      default: [],
+    },
+    // Don't use product prefix
+    isDraft: {
+      type: Boolean,
+      default: true,
+      // index for field often use
+      index: true,
+      // select false because when find document will not show this field
+      select: false,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+      // index for field often use
+      index: true,
+      // select false because when find document will not show this field
+      select: false,
+    },
   },
   {
     collection: COLLECTION_NAME,
     timestamps: true,
   },
 );
+
+// Product middleware run before save() and create()
+productSchema.pre("save", function (next) {
+  this.product_slug = slugify(this.product_name, { lower: true });
+  next();
+});
 
 const clothingSchema = new Schema(
   {

@@ -27,7 +27,7 @@ class Database {
         // Neu vuot qua pool size: connect do se vao queue, khi nao free thi su dung
         maxPoolSize: 50,
       })
-      .then((_) => console.log("Connect success, number of connections is: ", countCounnect()))
+      .then((_) => countCounnect())
       .catch((err) => console.log("Connect error: ", err));
   }
 
