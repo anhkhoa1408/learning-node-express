@@ -29,6 +29,7 @@ product_attributes: {
 
 const { BadRequestError } = require("../core/error.response");
 const { product, clothing, electronic, furniture } = require("../models/product.model");
+const { findAllDraftsForShop } = require("../models/repositories/product.repo");
 
 // Following factory - strategy design pattern (should use in complex - reusable project)
 
@@ -50,6 +51,11 @@ class ProductFactory {
     if (!productClass) throw new BadRequestError("Invalid product type");
 
     return await new productClass(payload).createProduct();
+  }
+
+  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isDraft: true };
+    return await findAllDraftsForShop({ query, limit, skip });
   }
 }
 
