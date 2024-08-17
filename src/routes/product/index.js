@@ -8,6 +8,8 @@ const { authenticationV2 } = require("../../auth/authUtils");
 // init router
 const router = express.Router();
 
+router.get("/search/:key", asyncHandler(productController.searchProductsByUser));
+
 // authentication
 router.use(authenticationV2);
 

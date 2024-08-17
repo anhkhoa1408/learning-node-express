@@ -1,7 +1,7 @@
 "use strict";
 
 const { HEADER } = require("../auth/checkAuth");
-const { SuccessResponse } = require("../core/success.response");
+const { SuccessResponse, OK } = require("../core/success.response");
 
 // Solution 1: Implement using factory pattern
 // const ProductService = require("../services/product.factory.service");
@@ -82,6 +82,20 @@ class ProductController {
       metadata: await ProductService.publishProductByShop({
         product_shop: req.user.userId,
         product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  /**
+   * @description Search product by user
+   * @param {String} key
+   * @returns {JSON}
+   */
+  searchProductsByUser = async (req, res, next) => {
+    return new OK({
+      message: "Success",
+      metadata: await ProductService.searchProductByUser({
+        keySearch: req.params.key,
       }),
     }).send(res);
   };

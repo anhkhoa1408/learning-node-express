@@ -56,9 +56,28 @@ const queryProduct = async ({ query, limit = 50, skip = 0 }) => {
   // For findOne, findById, find, exec is optional
 };
 
+const searchProductByUser = async ({ keySearch }) => {
+  const searchRegex = new RegExp(keySearch);
+  return await product
+    .find(
+      {
+        $text: {
+          $search: searchRegex,
+        },
+      },
+      {
+        score: {
+          $meta: "textScore",
+        },
+      },
+    )
+    .lean();
+};
+
 module.exports = {
   findAllDraftsForShop,
   findAllPublishForShop,
   publishProductByShop,
   unPublishProductByShop,
+  searchProductByUser,
 };
