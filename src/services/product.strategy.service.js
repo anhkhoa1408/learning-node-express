@@ -27,9 +27,14 @@ product_attributes: {
   required: true,
 }, */
 
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const { product, clothing, electronic, furniture } = require("../models/product.model");
-const { findAllDraftsForShop } = require("../models/repositories/product.repo");
+const {
+  findAllDraftsForShop,
+  publishProductByShop,
+  findAllPublishForShop,
+  unPublishProductByShop,
+} = require("../models/repositories/product.repo");
 
 // Following factory - strategy design pattern (should use in complex - reusable project)
 
@@ -53,9 +58,23 @@ class ProductFactory {
     return await new productClass(payload).createProduct();
   }
 
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({ product_shop, product_id });
+  }
+
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({ product_shop, product_id });
+  }
+
+  // QUERY //
   static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
     const query = { product_shop, isDraft: true };
     return await findAllDraftsForShop({ query, limit, skip });
+  }
+
+  static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isPublished: true };
+    return await findAllPublishForShop({ query, limit, skip });
   }
 }
 

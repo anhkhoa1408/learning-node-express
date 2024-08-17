@@ -22,7 +22,7 @@ class ProductController {
 
   /**
    *
-   * @description Get all Drafts for shop
+   * @description Get all Draft product for shop
    * @param {Number} limit
    * @param {Number} skip
    * @returns {JSON}
@@ -31,9 +31,57 @@ class ProductController {
     return new SuccessResponse({
       message: "Get list draft products successfully!",
       metadata: await ProductService.findAllDraftsForShop({
-        product_shop: req.headers[HEADER.CLIENT_ID],
+        product_shop: req.user.userId,
         limit: 50,
         skip: 0,
+      }),
+    }).send(res);
+  };
+
+  /**
+   *
+   * @description Get all Published product for shop
+   * @param {Number} limit
+   * @param {Number} skip
+   * @returns {JSON}
+   */
+  getAllPublishForShop = async (req, res, next) => {
+    return new SuccessResponse({
+      message: "Get list published products successfully!",
+      metadata: await ProductService.findAllPublishForShop({
+        product_shop: req.user.userId,
+        limit: 50,
+        skip: 0,
+      }),
+    }).send(res);
+  };
+
+  /**
+   * @description Publish a product by shop
+   * @param {String} product_id
+   * @returns {JSON}
+   */
+  publishProductByShop = async (req, res, next) => {
+    return new SuccessResponse({
+      message: "Publish product for shop successfully|",
+      metadata: await ProductService.publishProductByShop({
+        product_shop: req.user.userId,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  /**
+   * @description Unpublish a product by shop
+   * @param {String} product_id
+   * @returns {JSON}
+   */
+  unPublishProductByShop = async (req, res, next) => {
+    return new SuccessResponse({
+      message: "Unpublish product for shop successfully|",
+      metadata: await ProductService.publishProductByShop({
+        product_shop: req.user.userId,
+        product_id: req.params.id,
       }),
     }).send(res);
   };
