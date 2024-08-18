@@ -8,6 +8,7 @@ const { authenticationV2 } = require("../../auth/authUtils");
 // init router
 const router = express.Router();
 
+// public routes - this route will not be restricted by authentication
 router.get("/search/:key", asyncHandler(productController.searchProductsByUser));
 
 // authentication

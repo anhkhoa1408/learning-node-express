@@ -79,6 +79,7 @@ const productSchema = new Schema(
   },
 );
 
+// index text is used full-text search
 productSchema.index({
   product_name: "text",
   product_description: "text",

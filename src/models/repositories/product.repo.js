@@ -3,6 +3,9 @@
 const { Types } = require("mongoose");
 const { product, clothing, electronic, furniture } = require("./../product.model");
 
+// This is repositories pattern - this pattern will split all the logic from service class, service will only call
+// function and get the result, then communicate with controller
+
 const findAllDraftsForShop = async ({ query, limit = 50, skip = 0 }) => {
   return await queryProduct({ query, limit, skip });
 };
