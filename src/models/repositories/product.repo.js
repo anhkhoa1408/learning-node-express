@@ -64,6 +64,7 @@ const searchProductByUser = async ({ keySearch }) => {
   return await product
     .find(
       {
+        isPublished: true,
         $text: {
           $search: searchRegex,
         },
