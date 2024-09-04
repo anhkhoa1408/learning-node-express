@@ -35,6 +35,8 @@ const {
   findAllPublishForShop,
   unPublishProductByShop,
   searchProductByUser,
+  findAllProducts,
+  findProduct,
 } = require("../models/repositories/product.repo");
 
 // Following factory - strategy design pattern (should use in complex - reusable project)
@@ -81,6 +83,29 @@ class ProductFactory {
   static async searchProductByUser({ keySearch }) {
     return await searchProductByUser({ keySearch });
   }
+
+  static async findAllProducts({
+    limit = 50,
+    page = 1,
+    sort = "ctime",
+    filter = {
+      isPublished: true,
+    },
+  }) {
+    return await findAllProducts({
+      limit,
+      page,
+      sort,
+      filter,
+      select: ["product_name", "product_price", "product_thumb"],
+    });
+  }
+
+  static async findProduct({ product_id }) {
+    return await findProduct({ product_id, unSelect: ["__v", "product_variations"] });
+  }
+
+  static async updateProduct() {}
 }
 
 /* 

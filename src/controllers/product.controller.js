@@ -57,6 +57,37 @@ class ProductController {
   };
 
   /**
+   *
+   * @description Get all Products
+   * @param {Number} limit
+   * @param {Number} page
+   * @param {String} sort
+   * @param {Object} filter
+   * @returns {JSON}
+   */
+  findAllProducts = async (req, res, next) => {
+    return new SuccessResponse({
+      message: "Get list products successfully!",
+      metadata: await ProductService.findAllProducts(req.query),
+    }).send(res);
+  };
+
+  /**
+   *
+   * @description Get Product by id
+   * @param {String} product_id
+   * @returns {JSON}
+   */
+  findProduct = async (req, res, next) => {
+    return new SuccessResponse({
+      message: "Get product successfully!",
+      metadata: await ProductService.findProduct({
+        product_id: req.params.product_id,
+      }),
+    }).send(res);
+  };
+
+  /**
    * @description Publish a product by shop
    * @param {String} product_id
    * @returns {JSON}
