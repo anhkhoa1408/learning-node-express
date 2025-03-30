@@ -29,6 +29,7 @@ product_attributes: {
 
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const { product, clothing, electronic, furniture } = require("../models/product.model");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 const {
   findAllDraftsForShop,
   publishProductByShop,
@@ -140,10 +141,20 @@ class Product {
   }
 
   async createProduct(productId) {
-    return await product.create({
+    const newProduct = await product.create({
       ...this,
       _id: productId,
     });
+
+    if (newProduct) {
+      await insertInventory({
+        productId: newProduct._id,
+        shopId: newProduct.product_shop,
+        stock: newProduct.product_quantity,
+      });
+    }
+
+    return newProduct;
   }
 
   async updateProduct(productId, payload) {
