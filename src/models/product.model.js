@@ -43,7 +43,6 @@ const productSchema = new Schema(
       type: Schema.Types.Mixed,
       required: true,
     },
-
     product_averageRating: {
       type: Number,
       default: 4.5,

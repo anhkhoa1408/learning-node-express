@@ -82,7 +82,7 @@ class ProductController {
     return new SuccessResponse({
       message: "Get product successfully!",
       metadata: await ProductService.findProduct({
-        product_id: req.params.product_id,
+        product_id: req.params.id,
       }),
     }).send(res);
   };
@@ -127,6 +127,21 @@ class ProductController {
       message: "Success",
       metadata: await ProductService.searchProductByUser({
         keySearch: req.params.key,
+      }),
+    }).send(res);
+  };
+
+  /**
+   * @description Update product
+   * @param {String} product_id
+   * @returns {JSON}
+   */
+  updateProduct = async (req, res, next) => {
+    return new OK({
+      message: "Update product successfully",
+      metadata: await ProductService.updateProduct(req.body.product_type, req.params.id, {
+        ...req.body,
+        product_shop: req.user.userId,
       }),
     }).send(res);
   };

@@ -37,7 +37,9 @@ const {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
+const { removeInvalidPropsInObject, flattenObject } = require("../utils");
 
 // Following factory - strategy design pattern (should use in complex - reusable project)
 
@@ -59,6 +61,13 @@ class ProductFactory {
     if (!productClass) throw new BadRequestError("Invalid product type");
 
     return await new productClass(payload).createProduct();
+  }
+
+  static async updateProduct(type, productId, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass) throw new BadRequestError("Invalid product type");
+
+    return await new productClass(removeInvalidPropsInObject(payload)).updateProduct(productId);
   }
 
   static async publishProductByShop({ product_shop, product_id }) {
@@ -104,8 +113,6 @@ class ProductFactory {
   static async findProduct({ product_id }) {
     return await findProduct({ product_id, unSelect: ["__v", "product_variations"] });
   }
-
-  static async updateProduct() {}
 }
 
 /* 
@@ -132,10 +139,18 @@ class Product {
     this.product_attributes = product_attributes;
   }
 
-  async createProduct(product_id) {
+  async createProduct(productId) {
     return await product.create({
       ...this,
-      _id: product_id,
+      _id: productId,
+    });
+  }
+
+  async updateProduct(productId, payload) {
+    return await updateProductById({
+      productId,
+      payload,
+      model: product,
     });
   }
 }
@@ -157,6 +172,26 @@ class Clothing extends Product {
 
     return newProduct;
   }
+
+  async updateProduct(productId) {
+    /**
+     * 1. remove null or undefined attribute
+     * 2. WHERE to update
+     *  2.1 If product_attributes => sub class
+     *  2.2 If don't have product_attributes => product class
+     */
+    const objectParams = this;
+    if (objectParams.product_attributes) {
+      await updateProductById({
+        productId,
+        payload: flattenObject(objectParams.product_attributes),
+        model: clothing,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(productId, flattenObject(objectParams));
+    return updateProduct;
+  }
 }
 
 class Electronics extends Product {
@@ -172,6 +207,20 @@ class Electronics extends Product {
 
     return newProduct;
   }
+
+  async updateProduct(productId) {
+    const objectParams = this;
+    if (objectParams.product_attributes) {
+      await updateProductById({
+        productId,
+        payload: flattenObject(objectParams.product_attributes),
+        model: electronic,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(productId, flattenObject(objectParams));
+    return updateProduct;
+  }
 }
 
 class Furniture extends Product {
@@ -186,6 +235,20 @@ class Furniture extends Product {
     if (!newProduct) throw new BadRequestError("Create new product failed!");
 
     return newProduct;
+  }
+
+  async updateProduct(productId) {
+    const objectParams = this;
+    if (objectParams.product_attributes) {
+      await updateProductById({
+        productId,
+        payload: flattenObject(objectParams.product_attributes),
+        model: furniture,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(productId, flattenObject(objectParams));
+    return updateProduct;
   }
 }
 
