@@ -17,7 +17,7 @@ const findAllPublishForShop = async ({ query, limit = 50, skip = 0 }) => {
 
 const findAllProducts = async ({ limit, page, sort, filter, select }) => {
   const skip = (page - 1) * limit;
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 }; // creation time;
   const products = await product.find(filter).skip(skip).limit(limit).sort(sortBy).select(getSelectData(select)).lean();
   return products;
 };
