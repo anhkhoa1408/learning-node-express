@@ -1,0 +1,12 @@
+services:
+  backend:
+    image: ecommerce-backend
+    build: 
+      context: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}"

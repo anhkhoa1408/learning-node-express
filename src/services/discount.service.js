@@ -98,7 +98,7 @@ class DiscountService {
     return updatedDiscount;
   }
 
-  static async getAllDiscountCodesWithProduct({ code, shopId, limit, page }) {
+  static async getAllDiscountCodesWithProduct({ code, shopId, userId, limit, page }) {
     const { discount_applies_to, discount_type } = this.checkValidDiscount(code, shopId);
 
     let products;
