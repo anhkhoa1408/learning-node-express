@@ -3,35 +3,37 @@
 const mongoose = require("mongoose");
 const os = require("os");
 const process = require("process");
+
 const _SECONDS = 5000;
 
-// count connect
-const countCounnect = () => {
+// Count the number of active MongoDB connections
+const countConnect = () => {
   const numConnection = mongoose.connections.length;
-  console.log("Init mongodb, number of connection is: ", numConnection);
+  console.log("Init MongoDB, number of connections:", numConnection);
 };
 
-// check overload
+// Periodically check if the number of connections exceeds system capacity
 const checkOverload = () => {
   setInterval(() => {
     const numConnection = mongoose.connections.length;
     const numCore = os.cpus().length;
     const memoryUsage = process.memoryUsage().rss;
 
-    // Example my max connection per core is 5
+    // Example threshold: allow up to 5 connections per CPU core
     const maxConnections = numCore * 5;
-    console.log("Active connection", numConnection);
-    console.log("Memory usage", memoryUsage / Math.pow(1024, 2));
+
+    console.log("Active connections:", numConnection);
+    console.log("Memory usage (MB):", memoryUsage / Math.pow(1024, 2));
 
     if (numConnection > maxConnections) {
-      console.log("Connection overload detected: ");
-      // Khong can thiet dong ket noi mongodb lien tuc
-      // Mongodb co pool size
+      console.warn("⚠️ Connection overload detected!");
+      // No need to manually close MongoDB connections frequently
+      // MongoDB uses a connection pool to manage connections efficiently
     }
   }, _SECONDS);
 };
 
 module.exports = {
-  countCounnect,
+  countConnect,
   checkOverload,
 };

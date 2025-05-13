@@ -1,62 +1,73 @@
-// Require package
-
-/////////////////////////
-// morgan:
-// description: thu vien in ra cac log khi nguoi dung chay request (http request logger)
-// mode:
-// 1/ combined: log + apache standard (request ip, time request, method)
-// 2/ common
-// 3/ short
-// 4/ tiny
-// 5/ dev
-
-////////////////////////
-// helmet
-// Vấn đề: khi sử dụng curl, voi flag --include => dễ dàng xác
-// định được BE core sử dụng công nghệ gì với header option là X-Powered-by
-// helmet là 1 middleware sinh ra để ẩn đi header option này
-// chặn những thông tin riêng tư bị leak như cookie
-
-///////////////////////
-// conpression
-// khi những dữ liệu payload được trả về cho client với số lượng lớn => nén lại
-// tiết kiệm băng thông cho client
-
+// Load environment variables from .env file
 require("dotenv").config();
+
 const compression = require("compression");
 const express = require("express");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const { checkOverload } = require("./helpers/check.connect");
+
 const app = express();
 
-// init middlewares
+/////////////////////////
+// Morgan - HTTP request logger middleware
+// Helps track incoming requests for debugging and monitoring
+// Logging formats:
+// - 'combined': Standard Apache combined log output (IP, timestamp, method, etc.)
+// - 'common': Standard log format without detailed info
+// - 'short': Minimal log format with essential info
+// - 'tiny': Very short output
+// - 'dev': Concise colored output for development
+/////////////////////////
 app.use(morgan("dev"));
+
+/////////////////////////
+// Helmet - Security middleware
+// Helps secure the app by setting various HTTP headers
+// Example: removes the 'X-Powered-By' header to avoid exposing backend tech stack
+/////////////////////////
 app.use(helmet());
+
+/////////////////////////
+// Compression - Response compression middleware
+// Compresses response bodies for all requests
+// Reduces payload size and saves bandwidth for the client
+/////////////////////////
 app.use(compression());
+
+// Parse incoming requests with JSON payloads
 app.use(express.json());
+
+// Parse URL-encoded payloads (for form submissions)
 app.use(
   express.urlencoded({
-    extended: true,
+    extended: true, // Allows for rich objects and arrays to be encoded into the URL-encoded format
   }),
 );
 
-// init db
+// Initialize database connection
 require("./dbs/init.mongodb");
+
+// Optionally check system resource usage to avoid server overload
 // checkOverload();
 
-// init routes
+// Initialize application routes
 app.use("/", require("./routes"));
 
-// handle error
-// this middleware will set status to 404 for any invalid route, and passing to below (next) middleware
+/////////////////////////
+// 404 Error Handling Middleware
+// Catches all requests to undefined routes and forwards a 404 error
+/////////////////////////
 app.use((req, res, next) => {
   const error = new Error("Not found");
   error.status = 404;
   next(error);
 });
 
-// this middleware will handle errors so its has the first parameter named err
+/////////////////////////
+// General Error Handling Middleware
+// Handles all errors forwarded by previous middleware
+/////////////////////////
 app.use((err, req, res, next) => {
   console.log("app.use - err:", err);
   const statusCode = err.status || 500;

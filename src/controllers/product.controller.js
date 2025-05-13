@@ -1,6 +1,5 @@
 "use strict";
 
-const { HEADER } = require("../auth/checkAuth");
 const { SuccessResponse, OK } = require("../core/success.response");
 
 // Solution 1: Implement using factory pattern
