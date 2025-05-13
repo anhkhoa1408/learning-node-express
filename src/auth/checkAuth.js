@@ -1,6 +1,5 @@
 "use strict";
 
-// const apikeyModel = require("../models/apikey.model");
 const { findById } = require("../services/apiKey.service");
 
 const HEADER = {
