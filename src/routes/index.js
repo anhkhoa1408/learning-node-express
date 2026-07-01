@@ -5,7 +5,7 @@ const { apiKey, permission } = require("../auth/checkAuth");
 // init router
 const router = express.Router();
 
-// check apikey
+// check apiKey
 router.use(apiKey);
 
 // check valid routes

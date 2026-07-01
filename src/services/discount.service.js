@@ -1,8 +1,12 @@
 "use strict";
 
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const discount = require("../models/discount.model");
-const { findAllDiscountCodesUnSelect, updateDiscountById } = require("../models/repositories/discount.repos");
+const {
+  findAllDiscountCodesUnSelect,
+  updateDiscountById,
+  checkDiscountExists,
+} = require("../models/repositories/discount.repos");
 const { findAllProducts } = require("../models/repositories/product.repo");
 const { convertToObjectId, removeInvalidPropsInObject } = require("../utils");
 
@@ -18,12 +22,10 @@ const { convertToObjectId, removeInvalidPropsInObject } = require("../utils");
 
 class DiscountService {
   static async checkValidDiscount(code, shopId) {
-    const foundDiscount = await discount
-      .findOne({
-        discount_code: code,
-        discount_shopId: convertToObjectId(shopId),
-      })
-      .lean();
+    const foundDiscount = await checkDiscountExists(discount, {
+      discount_code: code,
+      discount_shopId: convertToObjectId(shopId),
+    });
 
     if (foundDiscount && foundDiscount.discount_is_active) {
       throw new BadRequestError("Discount existed");
@@ -90,7 +92,13 @@ class DiscountService {
       throw new BadRequestError("Invalid date");
     }
 
-    const updatedDiscount = await updateDiscountById(id, finalPayload, { new: true });
+    const updatedDiscount = await updateDiscountById({
+      id: convertToObjectId(id),
+      payload: finalPayload,
+      model: discount,
+      isNew: true,
+    });
+
     if (!updatedDiscount) {
       throw new BadRequestError("Not found");
     }
@@ -144,7 +152,43 @@ class DiscountService {
       page: +page,
       sort: "ctime",
       unSelect: ["__v", "discount_shopId"],
+      model: discount,
     });
+  }
+
+  /**
+   * Apply discount code to order
+   * products [
+   *  { productId, quantity, shopId, price, name },
+   * ]
+   */
+  static async getDiscountAmount({ codeId, userId, shopId, products }) {
+    const foundDiscount = await checkDiscountExists({
+      filter: {
+        _id: convertToObjectId(codeId),
+        discount_shopId: convertToObjectId(shopId),
+        discount_is_active: true,
+      },
+      model: discount,
+    });
+
+    if (!foundDiscount) {
+      throw new NotFoundError("Discount code not found");
+    }
+
+    const { discount_is_active, discount_max_uses, discount_start_date, discount_end_date } = foundDiscount;
+
+    if (!discount_is_active) {
+      throw new BadRequestError("Discount code is not active");
+    }
+
+    if (!discount_max_uses) {
+      throw new BadRequestError("Discount code has reached its maximum uses");
+    }
+
+    if (new Date() < new Date(discount_start_date) || new Date() > new Date(discount_end_date)) {
+      throw new BadRequestError("Discount code is not valid at this time");
+    }
   }
 }
 
